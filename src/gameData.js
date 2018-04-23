@@ -1,6 +1,7 @@
 import ChatRoom from './ChatRoom.js';
 import TicTacToe from './TicTacToe.js';
 import RockPaperScissors from './RockPaperScissors.js';
+import Mafia from './Mafia.js';
 
 const gameData = {
 
@@ -30,7 +31,15 @@ const gameData = {
     maxUsers: 2,
     component: RockPaperScissors,
   },
-
+  
+  mafia: {
+    title: "Mafia",
+    authors: "Caelan Springer, Daniel Lin, Daniel Zamilatskiy",
+    description: "Your greatest friends can be your greatest enemy. Trust no one but yourself.",
+    minUsers: 1,
+    maxUsers: 20,
+    component: Mafia,
+  }
 
 }
 
