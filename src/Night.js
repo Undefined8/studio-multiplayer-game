@@ -2,10 +2,21 @@ import React, { Component } from 'react';
 import FloatingActionButton from 'material-ui/FloatingActionButton';
 import ContentAdd from 'material-ui/svg-icons/content/add';
 import firebase from 'firebase';
+import UserApi from './UserApi.js'
 
 export default class Night extends Component {
     
+    constructor(props){
+        super(props);
+        this.state = {
+            buttonsDisabled: false
+        };
+    }
     
+    onButtonClick(e){
+        this.setState({buttonsDisabled: true});
+        this.props.handleKill(e.target.id);
+    }
     
     render() {
         
@@ -18,21 +29,23 @@ export default class Night extends Component {
             var listItems = [];
             
             for(var i = 0; i < players.length; i++){
-                listItems.push( (<li>{players[i].id}</li>) );
+                var id = players[i].id;
+                var handleClick = (e) => this.onButtonClick(e);
+                listItems.push( (<li><button id={id} onClick={handleClick} disabled={this.state.buttonsDisabled}> {UserApi.getName(id)} </button></li>) );
             }
             
             content = (
             <div>
                 <ul>{listItems}</ul>
-            </div>)
+            </div>);
         }else{
             content = (
             <div>
                 Sleep ._.
-            </div>)
+            </div>);
         }
         
-        return ({content})
+        return (<div>{content}</div>);
     }
     
 }

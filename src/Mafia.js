@@ -4,6 +4,7 @@ import ContentAdd from 'material-ui/svg-icons/content/add';
 import firebase from 'firebase';
 import Day from './Day.js';
 import Night from './Night.js';
+import Announcment from './Announcment.js';
 
 var roles = {
     Mafia: {
@@ -32,10 +33,16 @@ export default class Mafia extends Component {
         this.state = {
             time: 0,
             phase: 0,
-            players: []
+            players: [],
+            killedPlayers: []
         };
     }
-
+    handleKill(databaseRef, id){
+        this.setDataVar(databaseRef, "killedPlayers", )
+        this.setState({killedPlayers: this.state.killedPlayers.concat([id])});
+        console.log(id);
+    }
+    
     findMyPlayer() {
         var myId = firebase.auth().currentUser.uid;
 
@@ -80,7 +87,13 @@ export default class Mafia extends Component {
 
             if (phase === 0)
                 phase = 1;
-            else
+            else if(phase === 1)
+                phase = 2;
+            else if(phase === 2)
+                phase = 3;
+            else if(phase === 3)
+                phase = 4;
+            else if(phase === 4)
                 phase = 0;
 
             self.setDataVar(databaseRef, "phase", phase);
@@ -96,6 +109,8 @@ export default class Mafia extends Component {
             }
         });
     }
+
+
 
     componentWillMount() {
 
@@ -182,7 +197,10 @@ export default class Mafia extends Component {
             content = (<Day/>);
         }
         else if (this.state.phase === 1) {
-            content = (<Night players={this.state.players} currentPlayer={player} />);
+            content = (<Night players={this.state.players} currentPlayer={player} handleKill={(id) => this.handleKill(firebase.database().ref("/session/" + sessionId), id)}/>);
+        }
+        else if(this.state.phase === 2){
+            content = (<Announcment killedPlayers={this.state.killedPlayers}/>);
         }
 
         return (
