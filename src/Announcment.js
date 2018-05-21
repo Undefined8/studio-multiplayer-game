@@ -7,6 +7,9 @@ import UserApi from './UserApi.js'
 export default class Announcment extends Component {
 
     render() {
+        
+        console.log(this.props.killedPlayers);
+        
         var listItems = this.props.killedPlayers.map((id) => {
             return (<li>{UserApi.getName(id)}</li>);
         });

@@ -31,7 +31,7 @@ export default class Night extends Component {
             for(var i = 0; i < players.length; i++){
                 var id = players[i].id;
                 var handleClick = (e) => this.onButtonClick(e);
-                listItems.push( (<li><button id={id} onClick={handleClick} disabled={this.state.buttonsDisabled}> {UserApi.getName(id)} </button></li>) );
+                listItems.push( (<li><button className="color" id={id} onClick={handleClick} disabled={this.state.buttonsDisabled}> {UserApi.getName(id)} </button></li>) );
             }
             
             content = (

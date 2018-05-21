@@ -5,6 +5,7 @@ import firebase from 'firebase';
 import Day from './Day.js';
 import Night from './Night.js';
 import Announcment from './Announcment.js';
+import Voting from './Voting.js';
 
 var roles = {
     Mafia: {
@@ -38,8 +39,10 @@ export default class Mafia extends Component {
         };
     }
     handleKill(databaseRef, id){
-        this.setDataVar(databaseRef, "killedPlayers", )
-        this.setState({killedPlayers: this.state.killedPlayers.concat([id])});
+        
+        var newArray = this.state.killedPlayers.concat([id]);
+        
+        this.setDataVar(databaseRef, "killedPlayers", newArray);
         console.log(id);
     }
     
@@ -76,7 +79,6 @@ export default class Mafia extends Component {
 
         return array;
     }
-
     advancePhase(databaseRef) {
 
         var self = this;
@@ -99,7 +101,6 @@ export default class Mafia extends Component {
             self.setDataVar(databaseRef, "phase", phase);
 
         });
-
     }
 
     setDataVar(databaseRef, name, value) {
@@ -108,6 +109,17 @@ export default class Mafia extends Component {
                 console.error("Error storing session metadata", error);
             }
         });
+    }
+    
+    getDataVar(databaseRef, name){
+        
+        var result;
+        
+        databaseRef.child(name).once("value", (snapshot) => {
+            result = snapshot.val();
+        });
+        
+        return result;
     }
 
 
@@ -165,7 +177,7 @@ export default class Mafia extends Component {
                 currentTime--;
 
                 if (currentTime < 0) {
-                    currentTime = 5;
+                    currentTime = 10;
                     this.advancePhase(sessionDatabaseRef);
                 }
 
@@ -182,37 +194,44 @@ export default class Mafia extends Component {
         sessionDatabaseRef.child("players").on("value", (snapshot) => {
             this.setState({ players: snapshot.val() });
         });
+        sessionDatabaseRef.child("killedPlayers").on("value", (snapshot) => {
+            this.setState({ killedPlayers: snapshot.val() });
+        });
     }
-    //Add Buttons to set times, Server can't set the time 
+
     render() {
 
         var content;
         var player = this.findMyPlayer();
-
+        var databaseRef = firebase.database().ref("/session/" + this.props.match.params.id);
+        
         if (player == null) {
             return (<div> Game has started </div>);
         }
 
         if (this.state.phase === 0) {
-            content = (<Day/>);
+            content = (<Day players={this.state.players} currentPlayer={player}/>);
+        //} else if (this.state.phase === 1){
+          //  content = (<Voting players={this.state.players} currentPlayer={player}/>);
         }
         else if (this.state.phase === 1) {
-            content = (<Night players={this.state.players} currentPlayer={player} handleKill={(id) => this.handleKill(firebase.database().ref("/session/" + sessionId), id)}/>);
+            content = (<Night players={this.state.players} currentPlayer={player} handleKill={(id) => this.handleKill(databaseRef, id)}/>);
         }
         else if(this.state.phase === 2){
-            content = (<Announcment killedPlayers={this.state.killedPlayers}/>);
-        }
+            content = (<Announcment killedPlayers={this.getDataVar(databaseRef, "killedPlayers")}/>);
+        } 
 
         return (
-            <div>
             
-            <p> {this.state.time} </p>
-            
-            <p> {player.role.name} </p>
-            
-            {content}
-            
-            </div>
+                <div>
+                
+                <p> {this.state.time} </p>
+                
+                <p> {player.role.name} </p>
+                
+                {content}
+                
+                </div>
         )
     }
 }
